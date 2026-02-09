@@ -12,7 +12,7 @@ from aiogram.types import Message
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-TOKEN = os.getenv("8568717574:AAEFMhqvccnZ6u0Go_BDyppSK0Ph9Maraho")
+TOKEN = os.getenv("TOKEN")
 GROUP_ID = int(os.getenv("GROUP_ID"))  # -1001234567890
 
 bot = Bot(TOKEN)

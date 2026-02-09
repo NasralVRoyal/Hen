@@ -10,7 +10,7 @@ from aiogram.types import Message
 logging.basicConfig(level=logging.INFO)
 
 TOKEN = "8568717574:AAEFMhqvccnZ6u0Go_BDyppSK0Ph9Maraho"  # Замените на токен бота
-GROUP_ID = -8580261363  # Замените на ID вашей группы (получите через @userinfobot)
+GROUP_ID = 8580261363  # Замените на ID вашей группы (получите через @userinfobot)
 
 bot = Bot(TOKEN)
 dp = Dispatcher()

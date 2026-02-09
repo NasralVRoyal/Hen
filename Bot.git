@@ -1,0 +1,53 @@
+import asyncio
+import logging
+import random
+from datetime import timedelta, datetime
+
+from aiogram import Bot, Dispatcher, F, Router
+from aiogram.filters import CommandStart
+from aiogram.types import Message
+
+logging.basicConfig(level=logging.INFO)
+
+TOKEN = "8568717574:AAEFMhqvccnZ6u0Go_BDyppSK0Ph9Maraho"  # Замените на токен бота
+GROUP_ID = -8580261363  # Замените на ID вашей группы (получите через @userinfobot)
+
+bot = Bot(TOKEN)
+dp = Dispatcher()
+router = Router()
+dp.include_router(router)
+
+@router.message(CommandStart())
+async def start_captcha(message: Message):
+    a, b = random.randint(1, 20), random.randint(1, 20)
+    captcha_task = f"Решите: {a} + {b} = ?"
+    await message.answer(captcha_task)
+    # Сохраняем задачу в памяти (для простоты; в проде используйте Redis или DB)
+    dp["captcha"] = {"user_id": message.from_user.id, "answer": a + b, "task": captcha_task}
+
+@router.message(F.text)
+async def check_captcha(message: Message):
+    if message.text.isdigit():
+        stored = dp.get("captcha")
+        if stored and stored["user_id"] == message.from_user.id:
+            if int(message.text) == stored["answer"]:
+                # Создаём временную ссылку: 5 мин, 1 использование
+                expire_date = int((datetime.now() + timedelta(minutes=5)).timestamp())
+                link_data = await bot.create_chat_invite_link(
+                    chat_id=GROUP_ID,
+                    name="temp_invite",
+                    expire_date=expire_date,
+                    member_limit=1
+                )
+                await message.answer(f"✅ Капча пройдена! Временная ссылка:
+{link_data.invite_link}
+(действует 5 мин, 1 использование)")
+                del dp["captcha"]  # Очищаем
+                return
+    await message.answer("❌ Неверно. /start для новой капчи.")
+
+async def main():
+    await dp.start_polling(bot)
+
+if __name__ == "__main__":
+    asyncio.run(main())
